@@ -41,8 +41,9 @@ echo "-------> Installing Erlang/OTP $ver"
 ln -s ${ERLROOT} /app/otp
 ${ERLROOT}/Install -minimal /app/otp
 
-PATH=/app/otp/bin:$PATH
+PATH=$1/bin:/app/otp/bin:$PATH
 export PATH
+chmod +x $1/bin/wget
 
 cd $build
 
