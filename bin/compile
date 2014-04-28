@@ -60,8 +60,11 @@ else
         echo "-----> Installing Rebar from buildpack"
         cp ${bpdir}/opt/rebar ./
     fi
+    if [ -f .debug ]; then
+        REBAR_OPTS=-v
+    fi
     echo "-----> Building with Rebar"
-    ./rebar get-deps compile 2>&1 | sed -u 's/^/       /'
+    ./rebar ${REBAR_OPTS} get-deps compile 2>&1 | sed -u 's/^/       /'
     if [ ${PIPESTATUS[0]} -ne 0 ]; then
         echo "-----> Build failed"
         exit 1
