@@ -20,6 +20,21 @@ OTP_TARBALL_URL="https://s3.amazonaws.com/heroku-buildpack-erlang/${tarball}"
 ERLROOT=${build}/otp
 PROFILE=${HOME}/.profile.d
 
+export_env_dir() {
+    env_dir=$1
+    whitelist_regex=${2:-''}
+    blacklist_regex=${3:-'^(PATH|GIT_DIR|CPATH|CPPATH|LD_PRELOAD|LIBRARY_PATH)$'}
+    if [ -d "$env_dir" ]; then
+        for e in $(ls $env_dir); do
+            echo "$e" | grep -E "$whitelist_regex" | grep -qvE "$blacklist_regex" &&
+                export "$e=$(cat $env_dir/$e)"
+            :
+        done
+    fi
+}
+
+export_env_dir $3
+
 echo "-----> Using Erlang/OTP $ver"
 
 (
@@ -59,9 +74,6 @@ else
     if [ ! -e "rebar" ]; then
         echo "-----> Installing Rebar from buildpack"
         cp ${bpdir}/opt/rebar ./
-    fi
-    if [ -f .debug ]; then
-        REBAR_OPTS=-v
     fi
     echo "-----> Building with Rebar"
     ./rebar ${REBAR_OPTS} get-deps compile 2>&1 | sed -u 's/^/       /'
