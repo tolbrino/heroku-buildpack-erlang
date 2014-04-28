@@ -68,6 +68,20 @@ else
     fi
 fi
 
+if [ -f relx.config ]; then
+    if [ ! -e "relx" ]; then
+        echo "-----> Installing relx"
+        wget https://github.com/erlware/relx/releases/download/v0.6.0/relx
+        chmod +x relx
+    fi
+    echo "-----> Building release with relx"
+    ./relx 2>&1 | sed -u 's/^/       /'
+    if [ ${PIPESTATUS[0]} -ne 0 ]; then
+        echo "-----> Build failed"
+        exit 1
+    fi
+fi
+
 if [ -f ${bpdir}/opt/otp.sh ]; then
   mkdir -p ${PROFILE}
   cp ${bpdir}/opt/otp.sh ${PROFILE}
